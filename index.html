@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PROJECT ECHO // Real-Time Autonomous Digital Companionship</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #07090e;
+      --card-bg: rgba(15, 23, 42, 0.7);
+      --border: rgba(99, 102, 241, 0.2);
+      --primary: #6366f1;
+      --cyan: #06b6d4;
+      --emerald: #10b981;
+      --rose: #f43f5e;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      overflow-x: hidden;
+      line-height: 1.6;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(99, 102, 241, 0.15) 0%, transparent 60%),
+        radial-gradient(circle at 80% 50%, rgba(6, 182, 212, 0.08) 0%, transparent 40%),
+        linear-gradient(to bottom, rgba(7, 9, 14, 0.95), #07090e);
+    }
+
+    .mono {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Ambient noise & grid */
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-size: 50px 50px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 0 24px;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* Top Nav */
+    nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 28px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: 0.1em;
+      color: #fff;
+      text-transform: uppercase;
+    }
+
+    .logo-pulse {
+      width: 10px;
+      height: 10px;
+      background: var(--cyan);
+      border-radius: 50%;
+      box-shadow: 0 0 14px var(--cyan);
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 0.8; }
+      50% { transform: scale(1.6); opacity: 1; box-shadow: 0 0 20px var(--cyan); }
+    }
+
+    .nav-badge {
+      font-size: 0.75rem;
+      padding: 6px 14px;
+      background: rgba(99, 102, 241, 0.12);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #a5b4fc;
+      border-radius: 9999px;
+      font-weight: 600;
+      letter-spacing: 0.05em;
+    }
+
+    /* Hero Section */
+    .hero {
+      padding: 80px 0 60px;
+      text-align: center;
+    }
+
+    .hero-pre {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--cyan);
+      margin-bottom: 20px;
+      background: rgba(6, 182, 212, 0.08);
+      padding: 6px 16px;
+      border-radius: 9999px;
+      border: 1px solid rgba(6, 182, 212, 0.2);
+    }
+
+    .hero-title {
+      font-size: clamp(2.8rem, 7vw, 5rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.08;
+      margin-bottom: 24px;
+      background: linear-gradient(135deg, #ffffff 40%, #a5b4fc 80%, #06b6d4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-quote {
+      max-width: 760px;
+      margin: 0 auto 36px;
+      font-size: 1.15rem;
+      color: #cbd5e1;
+      font-style: italic;
+      border-left: 3px solid var(--primary);
+      padding: 8px 0 8px 24px;
+      text-align: left;
+      background: rgba(99, 102, 241, 0.04);
+      border-radius: 0 8px 8px 0;
+    }
+
+    .hero-quote cite {
+      display: block;
+      margin-top: 8px;
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-style: normal;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* Canvas visualizer */
+    .visualizer-container {
+      width: 100%;
+      height: 140px;
+      background: rgba(15, 23, 42, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      margin: 40px 0;
+      box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.8);
+    }
+
+    canvas {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .visualizer-overlay {
+      position: absolute;
+      top: 12px;
+      left: 18px;
+      font-size: 0.75rem;
+      color: var(--cyan);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Dual Cards */
+    .section-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      margin-bottom: 12px;
+      letter-spacing: -0.02em;
+    }
+
+    .section-desc {
+      color: var(--muted);
+      max-width: 650px;
+      margin-bottom: 40px;
+    }
+
+    .persona-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+      margin-bottom: 70px;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 32px;
+      backdrop-filter: blur(12px);
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .card:hover {
+      border-color: rgba(99, 102, 241, 0.5);
+      transform: translateY(-4px);
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.4);
+    }
+
+    .card.proxy {
+      border-top: 4px solid var(--cyan);
+    }
+
+    .card.companion {
+      border-top: 4px solid var(--primary);
+    }
+
+    .card-tag {
+      font-size: 0.75rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .card.proxy .card-tag { color: var(--cyan); }
+    .card.companion .card-tag { color: #a5b4fc; }
+
+    .card h3 {
+      font-size: 1.5rem;
+      margin-bottom: 12px;
+    }
+
+    .card-list {
+      list-style: none;
+      margin-top: 20px;
+    }
+
+    .card-list li {
+      position: relative;
+      padding-left: 24px;
+      margin-bottom: 12px;
+      font-size: 0.95rem;
+      color: #cbd5e1;
+    }
+
+    .card-list li::before {
+      content: "▹";
+      position: absolute;
+      left: 0;
+      color: var(--cyan);
+      font-weight: bold;
+    }
+
+    .card.companion .card-list li::before {
+      color: var(--primary);
+    }
+
+    /* Simulator Interactive Box */
+    .sim-wrapper {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 24px;
+      padding: 36px;
+      margin: 60px 0;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .sim-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .sim-tabs {
+      display: flex;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 4px;
+      border-radius: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .sim-tab {
+      background: transparent;
+      border: none;
+      color: var(--muted);
+      padding: 8px 18px;
+      font-size: 0.85rem;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .sim-tab.active {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
+    }
+
+    .sim-console {
+      background: #030712;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 24px;
+      min-height: 240px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .msg-bubble {
+      padding: 14px 18px;
+      border-radius: 16px;
+      max-width: 80%;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .msg-user {
+      align-self: flex-start;
+      background: rgba(255, 255, 255, 0.07);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #f1f5f9;
+    }
+
+    .msg-ai {
+      align-self: flex-end;
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(6, 182, 212, 0.25));
+      border: 1px solid rgba(99, 102, 241, 0.4);
+      color: #ffffff;
+    }
+
+    .meta-tag {
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      opacity: 0.7;
+      margin-bottom: 4px;
+      display: block;
+    }
+
+    .sim-input-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .sim-input {
+      flex: 1;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 12px 18px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+
+    .sim-input:focus {
+      outline: none;
+      border-color: var(--cyan);
+    }
+
+    .sim-btn {
+      background: var(--cyan);
+      color: #000;
+      font-weight: 700;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .sim-btn:hover {
+      background: #22d3ee;
+      box-shadow: 0 0 16px rgba(6, 182, 212, 0.5);
+    }
+
+    /* Roadmap Timeline */
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin: 40px 0 80px;
+    }
+
+    .timeline-step {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 16px;
+      padding: 24px;
+      position: relative;
+    }
+
+    .stage-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 6px;
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .s1 { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+    .s2 { background: rgba(245, 158, 11, 0.15); color: #fbbf24; }
+    .s3 { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+      padding: 50px 0 60px;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .btn-github {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      background: #ffffff;
+      color: #000;
+      font-weight: 700;
+      padding: 14px 28px;
+      border-radius: 12px;
+      text-decoration: none;
+      margin: 20px 0 30px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-github:hover {
+      background: #e2e8f0;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2);
+    }
+  </style>
+</head>
+<body>
+  <div class="grid-bg"></div>
+
+  <div class="container">
+    <nav>
+      <div class="logo">
+        <div class="logo-pulse"></div>
+        <span>PROJECT ECHO</span>
+      </div>
+      <div class="nav-badge mono">CONCEPT PHASE // FUTURE INITIATIVE</div>
+    </nav>
+
+    <header class="hero">
+      <div class="hero-pre mono">
+        <span>⚡ CONCEPT ANNOUNCEMENT TRAILER</span>
+      </div>
+      <h1 class="hero-title">Real-Time Autonomous<br/>Digital Companionship</h1>
+      
+      <div class="hero-quote">
+        "An emotion operates on a ticking clock. If a thought is shared and no one is there to catch it, the interest fades, the moment passes, and isolation deepens. We are hyper-connected, yet chronically out of sync."
+        <cite>— Project Echo Concept Proposal</cite>
+      </div>
+
+      <!-- Real-Time Resonance Visualizer -->
+      <div class="visualizer-container">
+        <div class="visualizer-overlay mono">
+          <span>● AUDIO RESONANCE SIMULATOR [ONLINE]</span>
+          <span style="opacity: 0.5;">|</span>
+          <span id="latency-tag">TARGET LATENCY: &lt;180ms</span>
+        </div>
+        <canvas id="waveCanvas"></canvas>
+      </div>
+    </header>
+
+    <section>
+      <h2 class="section-title">The Dual-Persona Framework</h2>
+      <p class="section-desc">
+        Modern communication forces humans to match erratic schedules. Project Echo introduces personalized localized digital twins that act as active intermediaries.
+      </p>
+
+      <div class="persona-grid">
+        <div class="card proxy">
+          <div class="card-tag mono">01 // AUTOPILOT</div>
+          <h3>The Proxy</h3>
+          <p style="color: #cbd5e1; font-size: 0.95rem;">
+            Designed for the busy individual. The Proxy acts as a front-line communicator that absorbs daily social overload.
+          </p>
+          <ul class="card-list">
+            <li>Mimics the user's exact vocabulary, humor, and tone.</li>
+            <li>Handles routine coordination and check-ins instantly while you focus.</li>
+            <li>Protects relationships without cognitive battery drain.</li>
+            <li>Quietly hands off when high nuance or sensitivity is detected.</li>
+          </ul>
+        </div>
+
+        <div class="card companion">
+          <div class="card-tag mono">02 // SYNTHESIZER</div>
+          <h3>The Companion</h3>
+          <p style="color: #cbd5e1; font-size: 0.95rem;">
+            Designed for the individual seeking immediate connection. A localized zero-latency sounding board.
+          </p>
+          <ul class="card-list">
+            <li>Sub-200ms round-trip responses before the emotional spark dies.</li>
+            <li>Emulates specific peer group dynamics, banter, or deep empathy.</li>
+            <li>Consequence-free safe sandbox to vent, brainstorm, or explore ideas.</li>
+            <li>Zero cloud transmission: 100% private, on-device intelligence.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Interactive Persona Simulator -->
+    <section class="sim-wrapper">
+      <div class="sim-header">
+        <div>
+          <h3 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 4px;">Interactive Persona Console</h3>
+          <p style="color: var(--muted); font-size: 0.85rem;">Test how the architecture balances social saturation vs. social starvation.</p>
+        </div>
+        <div class="sim-tabs">
+          <button class="sim-tab active" id="tabProxy" onclick="switchMode('proxy')">The Proxy (Autopilot)</button>
+          <button class="sim-tab" id="tabCompanion" onclick="switchMode('companion')">The Companion (Synthesizer)</button>
+        </div>
+      </div>
+
+      <div class="sim-console" id="consoleFeed">
+        <!-- Messages rendered by JS -->
+      </div>
+
+      <div class="sim-input-row">
+        <input type="text" id="simUserInput" class="sim-input" placeholder="Type a message or click a preset..." onkeydown="if(event.key==='Enter') sendSimMessage()">
+        <button class="sim-btn" onclick="sendSimMessage()">Transmit</button>
+      </div>
+
+      <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;">
+        <span style="font-size: 0.75rem; color: var(--muted); align-self: center;">Presets:</span>
+        <button class="sim-tab" style="background: rgba(255,255,255,0.05); font-size: 0.75rem; padding: 4px 10px;" onclick="loadPreset('Yo Keerthi, are you free for a quick sync?')">"Free for a sync?"</button>
+        <button class="sim-tab" style="background: rgba(255,255,255,0.05); font-size: 0.75rem; padding: 4px 10px;" onclick="loadPreset('I just had this breakthrough idea for autonomous digital twins!')">"Breakthrough idea!"</button>
+        <button class="sim-tab" style="background: rgba(255,255,255,0.05); font-size: 0.75rem; padding: 4px 10px;" onclick="loadPreset('Honestly feeling pretty overwhelmed with this deadline today.')">"Feeling overwhelmed..."</button>
+      </div>
+    </section>
+
+    <!-- Phased Roadmap -->
+    <section>
+      <h2 class="section-title">Phased Implementation Roadmap</h2>
+      <p class="section-desc">A staged multi-modal evolution scaling from local chat models to photorealistic digital twin telepresence.</p>
+
+      <div class="timeline">
+        <div class="timeline-step">
+          <span class="stage-badge s1 mono">Stage 01</span>
+          <h4 style="font-size: 1.15rem; margin-bottom: 8px;">Text-Based Architecture</h4>
+          <p style="font-size: 0.88rem; color: #cbd5e1; line-height: 1.5;">
+            Deployment of localized quantized SLMs (Gemma / Llama). Contextual memory buffers, tone-matching embeddings, and silent human-in-the-loop handoff.
+          </p>
+        </div>
+
+        <div class="timeline-step">
+          <span class="stage-badge s2 mono">Stage 02</span>
+          <h4 style="font-size: 1.15rem; margin-bottom: 8px;">Voice Integration</h4>
+          <p style="font-size: 0.88rem; color: #cbd5e1; line-height: 1.5;">
+            Sub-100ms streaming STT & expressive neural TTS. Agents mirror vocal cadences, pauses, emotional inflections, and handle real-time voice calls.
+          </p>
+        </div>
+
+        <div class="timeline-step">
+          <span class="stage-badge s3 mono">Stage 03</span>
+          <h4 style="font-size: 1.15rem; margin-bottom: 8px;">Real-Time Visual Avatars</h4>
+          <p style="font-size: 0.88rem; color: #cbd5e1; line-height: 1.5;">
+            Edge neural video synthesis. Dynamic micro-expression mapping, lip-syncing, and virtual camera integration for embodied video presence.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p style="font-weight: 600; color: #f8fafc; font-size: 1rem; margin-bottom: 6px;">PROJECT ECHO // CONCEPT REPOSITORY</p>
+      <p>Initiative conceptualized & architected by <strong>Valluri Keerthi Ram</strong></p>
+      
+      <a href="https://github.com/Vallurikeerthiram/project-echo" target="_blank" class="btn-github">
+        <svg height="20" width="20" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/>
+        </svg>
+        View & Star on GitHub
+      </a>
+
+      <p style="font-size: 0.8rem; color: #64748b;">
+        This repository serves as the official concept proposal, architecture blueprint, and future development teaser.
+      </p>
+    </footer>
+  </div>
+
+  <script>
+    // Audio Wave Visualizer Simulation
+    const canvas = document.getElementById('waveCanvas');
+    const ctx = canvas.getContext('2d');
+    let width, height;
+
+    function resize() {
+      width = canvas.width = canvas.offsetWidth;
+      height = canvas.height = canvas.offsetHeight;
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    let step = 0;
+    function renderWave() {
+      ctx.clearRect(0, 0, width, height);
+      step += 0.035;
+
+      const lines = 4;
+      for (let j = 0; j < lines; j++) {
+        ctx.beginPath();
+        ctx.lineWidth = j === 0 ? 2.5 : 1;
+        ctx.strokeStyle = j === 0 ? '#06b6d4' : j === 1 ? '#6366f1' : 'rgba(99, 102, 241, 0.2)';
+
+        for (let x = 0; x < width; x += 3) {
+          const norm = (x / width) * Math.PI * 4;
+          const amp = Math.sin(x / 50 + step) * 20 * Math.sin(x / width * Math.PI);
+          const y = height / 2 + Math.sin(norm + step + j * 0.7) * (20 + j * 6) + amp;
+          if (x === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.stroke();
+      }
+      requestAnimationFrame(renderWave);
+    }
+    renderWave();
+
+    // Mode simulation
+    let currentMode = 'proxy';
+    const consoleFeed = document.getElementById('consoleFeed');
+
+    const demoDialogues = {
+      proxy: [
+        {
+          user: "Hey Keerthi, did you see the email about the project deadline?",
+          ai: "Hey! Caught it briefly—currently heads down in deep focus. Nothing urgent needed from our side till Friday. Will loop back properly this evening!",
+          meta: "THE PROXY (AUTOPILOT) • LATENCY: 220ms • CONFIDENCE: 96% • NO HANDOFF TRIGGER"
+        }
+      ],
+      companion: [
+        {
+          user: "I have this crazy thought about using local SLMs to prevent social starvation...",
+          ai: "Tell me everything! That directly tackles the four-hour delay problem. If you decouple human presence from instantaneous response, people never have to watch their thoughts wither away in silence. How would you calibrate the tone?",
+          meta: "THE COMPANION (SYNTHESIZER) • LATENCY: 140ms • ZERO-CLOUD • SAFE SANDBOX"
+        }
+      ]
+    };
+
+    function renderFeed() {
+      const msgs = demoDialogues[currentMode];
+      consoleFeed.innerHTML = msgs.map(m => `
+        <div class="msg-bubble msg-user">
+          <span class="meta-tag mono">TRANSMISSION // INCOMING</span>
+          ${m.user}
+        </div>
+        <div class="msg-bubble msg-ai">
+          <span class="meta-tag mono">${m.meta}</span>
+          ${m.ai}
+        </div>
+      `).join('');
+      consoleFeed.scrollTop = consoleFeed.scrollHeight;
+    }
+
+    function switchMode(mode) {
+      currentMode = mode;
+      document.getElementById('tabProxy').classList.toggle('active', mode === 'proxy');
+      document.getElementById('tabCompanion').classList.toggle('active', mode === 'companion');
+      document.getElementById('latency-tag').innerText = mode === 'proxy' 
+        ? "AUTOPILOT FILTER: ACTIVE (<250ms)" 
+        : "ZERO-LATENCY SOUNDING BOARD (<150ms)";
+      renderFeed();
+    }
+
+    function loadPreset(text) {
+      document.getElementById('simUserInput').value = text;
+      sendSimMessage();
+    }
+
+    function sendSimMessage() {
+      const input = document.getElementById('simUserInput');
+      const val = input.value.trim();
+      if (!val) return;
+
+      let aiResp, meta;
+      if (currentMode === 'proxy') {
+        if (val.toLowerCase().includes('urgent') || val.toLowerCase().includes('contract') || val.toLowerCase().includes('overwhelm')) {
+          aiResp = "[Handoff Alert Triggered] 🔔 Message flagged with high emotional/contextual weight. The Proxy paused autopilot and queued a priority notification to Keerthi.";
+          meta = "THE PROXY (HANDOFF TRIGGERED) • SILENT ESCALATION TO OPERATOR";
+        } else {
+          aiResp = "Got your note! Handling a few things right now, but noted on this. I'll get back to you with the full update soon.";
+          meta = "THE PROXY (AUTOPILOT) • LATENCY: 210ms • STYLISTIC MATCH: 98%";
+        }
+      } else {
+        aiResp = "I hear you loud and clear. That makes complete sense—let's unpack that thought before it loses its momentum. What's the immediate next thread?";
+        meta = "THE COMPANION (SYNTHESIZER) • LATENCY: 135ms • CONVERSATIONAL SOUNDING BOARD";
+      }
+
+      demoDialogues[currentMode].push({
+        user: val,
+        ai: aiResp,
+        meta: meta
+      });
+
+      input.value = '';
+      renderFeed();
+    }
+
+    renderFeed();
+  </script>
+</body>
+</html>

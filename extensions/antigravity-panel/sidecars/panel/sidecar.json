@@ -1,0 +1,18 @@
+{
+  "command": "node",
+  "args": ["main.mjs"],
+  "restart_policy": "always",
+  "display_name": "Project Echo Console",
+  "description": "Real-time monitor and simulation console for Project Echo: Dual-Persona architecture, latency metrics, and handoff supervisor.",
+  "has_web_ui": true,
+  "ui_config": {
+    "display_name": "Project Echo Console",
+    "views": [
+      {
+        "path": "/",
+        "entrypoint": "SIDECAR_UI_ENTRYPOINT_AUX_PANE",
+        "title": "Project Echo"
+      }
+    ]
+  }
+}

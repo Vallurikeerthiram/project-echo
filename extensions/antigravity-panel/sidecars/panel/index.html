@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="/styles.css">
+  <script src="/preload.js"></script>
+</head>
+<body>
+  <div class="panel">
+    <div class="panel-header">
+      <div class="title-row">
+        <div class="title-badge">
+          <span class="cyan-dot"></span>
+          <h1>PROJECT ECHO // CONSOLE</h1>
+        </div>
+        <span id="system-badge" class="badge ok">STANDALONE</span>
+      </div>
+      <div class="quote-box">
+        "An emotion operates on a ticking clock. If a thought is shared and no one is there to catch it, the interest fades..."
+      </div>
+    </div>
+
+    <!-- Active Persona Mode -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Dual-Persona Selector</h2>
+        <span id="mode-badge" class="badge companion">SYNTHESIZER</span>
+      </div>
+      <div class="toggle-group">
+        <button id="btn-proxy" class="mode-btn">The Proxy (Autopilot)</button>
+        <button id="btn-companion" class="mode-btn active">The Companion</button>
+      </div>
+      <dl class="facts">
+        <dt>Target Latency:</dt>
+        <dd id="latency-val">&lt; 150 ms (Sub-second reflex)</dd>
+        <dt>Privacy Tier:</dt>
+        <dd>100% Local / On-Device</dd>
+        <dt>Handoff Status:</dt>
+        <dd id="handoff-status">Standby / Monitoring</dd>
+      </dl>
+    </div>
+
+    <!-- Live Simulator -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Interactive Reflex Sandbox</h2>
+      </div>
+      <div id="sim-output" class="sim-box">
+        <div style="color: var(--muted-foreground); margin-bottom: 4px;">[Incoming Dialogue]</div>
+        <div id="sim-response">Click "Transmit" or type below to test reaction latency and handoff thresholds.</div>
+      </div>
+      <div class="sim-input-row">
+        <input type="text" id="sim-input" placeholder="Type test message...">
+        <button id="btn-send" class="action-btn">Transmit</button>
+      </div>
+    </div>
+
+    <!-- Phased Roadmap Checklist -->
+    <div class="card">
+      <div class="card-header">
+        <h2>Phased Roadmap Progress</h2>
+        <span class="badge ok">CONCEPT</span>
+      </div>
+      <dl class="facts">
+        <dt>Stage 1:</dt>
+        <dd>Text & Local SLM Memory</dd>
+        <dt>Stage 2:</dt>
+        <dd>Low-Latency Voice (STT & TTS)</dd>
+        <dt>Stage 3:</dt>
+        <dd>Neural Real-Time Avatars</dd>
+      </dl>
+    </div>
+
+    <div id="toast" class="toast" hidden></div>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>

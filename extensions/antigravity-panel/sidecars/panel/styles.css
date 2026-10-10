@@ -1,0 +1,219 @@
+:root {
+  --radius: 12px;
+  --gap: 12px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+[hidden] {
+  display: none !important;
+}
+
+body {
+  margin: 0;
+  background: var(--background, #080b11);
+  color: var(--foreground, #f3f4f6);
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+  max-width: 650px;
+  margin: 0 auto;
+  padding: 14px;
+}
+
+.panel-header {
+  border-bottom: 1px solid var(--border, #1f2937);
+  padding-bottom: 10px;
+}
+
+.title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.title-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cyan-dot {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: #06b6d4;
+  box-shadow: 0 0 10px #06b6d4;
+  display: inline-block;
+}
+
+.panel-header h1 {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+}
+
+.quote-box {
+  margin-top: 8px;
+  padding: 8px 12px;
+  background: color-mix(in srgb, var(--primary, #6366f1) 8%, transparent);
+  border-left: 2px solid var(--primary, #6366f1);
+  border-radius: 0 8px 8px 0;
+  font-style: italic;
+  font-size: 11px;
+  color: var(--muted-foreground, #94a3b8);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 12px 14px;
+  background: var(--card, #111827);
+  border: 1px solid var(--card-border, var(--border, #1f2937));
+  border-radius: var(--radius);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.card h2 {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--muted-foreground, #94a3b8);
+}
+
+.facts {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 4px 12px;
+  margin: 0;
+  font-size: 12px;
+}
+
+.facts dt {
+  color: var(--muted-foreground, #94a3b8);
+}
+
+.facts dd {
+  margin: 0;
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-weight: 500;
+}
+
+.badge {
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  font-family: ui-monospace, monospace;
+}
+
+.badge.ok {
+  background: rgba(6, 182, 212, 0.15);
+  color: #06b6d4;
+  border: 1px solid rgba(6, 182, 212, 0.3);
+}
+
+.badge.companion {
+  background: rgba(99, 102, 241, 0.15);
+  color: #818cf8;
+  border: 1px solid rgba(99, 102, 241, 0.3);
+}
+
+.toggle-group {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin: 4px 0;
+}
+
+button.mode-btn {
+  padding: 8px;
+  border: 1px solid var(--border, #374151);
+  background: transparent;
+  color: var(--muted-foreground, #94a3b8);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+button.mode-btn.active {
+  background: var(--primary, #6366f1);
+  color: #fff;
+  border-color: var(--primary, #6366f1);
+  box-shadow: 0 0 12px rgba(99, 102, 241, 0.4);
+}
+
+.sim-box {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border, #1f2937);
+  border-radius: 8px;
+  padding: 10px;
+  min-height: 80px;
+  font-size: 12px;
+}
+
+.sim-input-row {
+  display: flex;
+  gap: 8px;
+}
+
+.sim-input-row input {
+  flex: 1;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid var(--border, #374151);
+  border-radius: 8px;
+  padding: 6px 10px;
+  color: #fff;
+  font-size: 12px;
+}
+
+.sim-input-row input:focus {
+  outline: none;
+  border-color: #06b6d4;
+}
+
+button.action-btn {
+  padding: 6px 12px;
+  background: #06b6d4;
+  color: #000;
+  border: none;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  font-size: 12px;
+}
+
+.toast {
+  position: fixed;
+  bottom: 12px;
+  left: 14px;
+  right: 14px;
+  background: var(--card, #111827);
+  border: 1px solid #06b6d4;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 11px;
+  text-align: center;
+}

@@ -1,0 +1,5 @@
+{
+  "name": "project-echo",
+  "description": "Project Echo Control & Teaser Console: Monitor Dual-Persona status (Proxy vs Companion), stream latency metrics, and test handoff triggers.",
+  "logo": "assets/logo.svg"
+}
